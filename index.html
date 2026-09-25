@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e313f">
+  <meta name="description" content="Cuento ilustrado en español protagonizado por Diego y Claudia.">
+  <title>El Pastor y la Cabra</title>
+  <style>
+    :root {
+      --ink: #20313e;
+      --muted: #6d746f;
+      --blue: #263e50;
+      --blue-dark: #1a2b38;
+      --copper: #b56d4e;
+      --paper: #fffdf8;
+      --line: rgba(32, 49, 62, .14);
+      --shadow: 0 28px 60px rgba(29, 42, 47, .24), 0 8px 18px rgba(29, 42, 47, .14);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(181, 109, 78, .11), transparent 28rem),
+        radial-gradient(circle at 86% 80%, rgba(38, 62, 80, .11), transparent 32rem),
+        linear-gradient(135deg, #eee5d7 0%, #f7f2e9 48%, #e8e0d2 100%);
+      font-family: Georgia, "Times New Roman", serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      content: "";
+      opacity: .28;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+      mix-blend-mode: multiply;
+    }
+
+    button, input { font: inherit; }
+    button { border: 0; cursor: pointer; }
+    button:focus-visible, input:focus-visible { outline: 3px solid rgba(181, 109, 78, .55); outline-offset: 3px; }
+
+    .app {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 100svh;
+      padding: clamp(18px, 3vw, 36px) clamp(14px, 4vw, 64px) clamp(16px, 3vw, 30px);
+    }
+
+    .topbar, .footer { width: min(1180px, 100%); margin: 0 auto; }
+    .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--copper);
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 620px;
+      margin: 0;
+      color: var(--blue-dark);
+      font-size: clamp(30px, 4.1vw, 58px);
+      font-weight: 500;
+      letter-spacing: -.045em;
+      line-height: .98;
+    }
+
+    .author { margin: 11px 0 0; color: var(--muted); font-size: clamp(15px, 1.4vw, 19px); }
+    .top-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+
+    .small-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 0 15px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--blue);
+      background: rgba(255, 253, 248, .58);
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      font-size: 12px;
+      letter-spacing: .02em;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .small-button:hover { transform: translateY(-2px); background: var(--paper); border-color: rgba(38, 62, 80, .28); }
+    .small-button svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; }
+
+    main { display: grid; place-items: center; width: 100%; padding: clamp(20px, 4vw, 48px) 0 clamp(16px, 3vw, 34px); }
+
+    .reader {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: clamp(12px, 2vw, 26px);
+      width: min(100%, 1240px);
+    }
+
+    .book-column { display: grid; gap: 18px; min-width: 0; }
+
+    .book-stage {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: min(100%, 960px);
+      aspect-ratio: 1100 / 850;
+      margin: 0 auto;
+      perspective: 1400px;
+    }
+
+    .book-stage.is-cover,
+    .book-stage.is-single {
+      width: min(100%, 520px);
+      aspect-ratio: 550 / 850;
+    }
+
+    .book-stage::before, .book-stage::after { position: absolute; z-index: -1; content: ""; pointer-events: none; }
+    .book-stage::before { inset: 6% -3% -3%; border-radius: 12px 24px 20px 12px; background: rgba(38, 62, 80, .16); filter: blur(18px); transform: rotate(1deg); }
+    .book-stage::after { inset: 0 -7px 0 7px; border-radius: 7px 18px 18px 7px; background: linear-gradient(90deg, rgba(38, 62, 80, .18), transparent 10%, transparent 92%, rgba(38, 62, 80, .1)); opacity: .7; }
+
+    .spread-frame {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      overflow: hidden;
+      margin: 0;
+      border-radius: 7px 17px 17px 7px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateX(18px) rotateY(-6deg) scale(.985);
+      transform-origin: 0 50%;
+      transition: opacity .22s ease, transform .4s cubic-bezier(.2, .75, .2, 1);
+      pointer-events: none;
+      will-change: opacity, transform;
+    }
+
+    .spread-frame.active { z-index: 2; opacity: 1; transform: translateX(0) rotateY(0) scale(1); pointer-events: auto; }
+    .spread-frame.previous { transform: translateX(-18px) rotateY(6deg) scale(.985); }
+
+    .spread-frame.cover,
+    .spread-frame.single {
+      grid-template-columns: 1fr;
+    }
+
+    .spread-frame.cover .left-page,
+    .spread-frame.single .left-page {
+      display: none;
+    }
+
+    .spread-frame.cover .right-page,
+    .spread-frame.single .right-page {
+      grid-column: 1;
+    }
+
+    .spread-frame::after { position: absolute; inset: 0; pointer-events: none; content: ""; border: 1px solid rgba(32, 49, 62, .11); border-radius: inherit; box-shadow: inset 8px 0 16px rgba(32, 49, 62, .08), inset -2px 0 0 rgba(255, 255, 255, .36); }
+
+    .spread-page { min-width: 0; min-height: 0; background-color: var(--paper); background-repeat: no-repeat; background-size: 200% 100%; }
+    .spread-page.left-page { background-position: left center; border-right: 1px solid rgba(32, 49, 62, .14); }
+    .spread-page.right-page { background-position: right center; }
+    .spread-page.blank-page { background-image: none !important; background-color: #fffdf8; }
+    .spread-page::after { display: block; width: 100%; height: 100%; content: ""; box-shadow: inset 0 0 0 1px rgba(32, 49, 62, .03); }
+
+    .side-button { display: grid; flex: 0 0 auto; place-items: center; width: 52px; height: 52px; border: 1px solid rgba(38, 62, 80, .16); border-radius: 50%; color: var(--blue); background: rgba(255, 253, 248, .7); box-shadow: 0 7px 18px rgba(29, 42, 47, .08); transition: transform .2s ease, color .2s ease, background .2s ease; }
+    .side-button:hover:not(:disabled) { color: white; background: var(--blue); transform: scale(1.06); }
+    .side-button:disabled { cursor: default; opacity: .28; }
+    .side-button svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+    .controls { display: grid; gap: 10px; width: min(100%, 960px); margin: 0 auto; }
+    .progress-wrap { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 13px; color: var(--muted); font-family: "Trebuchet MS", Arial, sans-serif; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    .progress-wrap strong { color: var(--blue); font-weight: 700; }
+    input[type="range"] { width: 100%; height: 20px; margin: 0; cursor: pointer; accent-color: var(--copper); }
+    .hint { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; text-align: center; }
+
+    .footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-top: 12px; border-top: 1px solid rgba(32, 49, 62, .12); color: var(--muted); font-family: "Trebuchet MS", Arial, sans-serif; font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
+    .footer p { margin: 0; }
+    .footer .ornament { color: var(--copper); letter-spacing: .28em; }
+
+    .toast { position: fixed; right: 18px; bottom: 18px; z-index: 10; max-width: min(320px, calc(100vw - 36px)); padding: 12px 15px; border-radius: 12px; color: #fffaf1; background: var(--blue-dark); box-shadow: 0 12px 28px rgba(29, 42, 47, .22); font-family: "Trebuchet MS", Arial, sans-serif; font-size: 13px; opacity: 0; transform: translateY(10px); transition: opacity .2s ease, transform .2s ease; pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 720px) {
+      .app { padding-top: 16px; }
+      .topbar { align-items: center; }
+      .top-actions { gap: 7px; }
+      .small-button { min-height: 38px; padding: 0 12px; font-size: 10px; }
+      .small-button span { display: none; }
+      h1 { font-size: clamp(30px, 9vw, 44px); }
+      .author { margin-top: 8px; font-size: 14px; }
+      main { padding-top: 22px; }
+      .reader { grid-template-columns: 1fr; gap: 14px; }
+      .book-column { position: relative; }
+      .side-button { position: absolute; z-index: 5; width: 43px; height: 43px; background: rgba(255, 253, 248, .88); }
+      .side-button.prev { left: -6px; }
+      .side-button.next { right: -6px; }
+      .book-stage { width: min(100%, 500px); aspect-ratio: 550 / 1700; }
+      .spread-frame { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; border-radius: 7px 17px 17px 7px; }
+      .book-stage.is-cover, .book-stage.is-single { aspect-ratio: 550 / 850; }
+      .spread-frame.cover .left-page, .spread-frame.single .left-page { display: none; }
+      .spread-frame.cover .right-page, .spread-frame.single .right-page { grid-row: 1 / -1; }
+      .spread-page.left-page { border-right: 0; border-bottom: 1px solid rgba(32, 49, 62, .14); }
+      .footer { align-items: flex-start; flex-direction: column; gap: 5px; }
+      .footer .ornament { display: none; }
+      .hint { font-size: 13px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Una historia ilustrada de Diego y Claudia</p>
+        <h1>El Pastor y la Cabra</h1>
+        <p class="author">De Diego Pérez Paz</p>
+      </div>
+      <div class="top-actions" aria-label="Acciones del libro">
+        <button class="small-button" id="shareButton" type="button" aria-label="Compartir el libro">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 13v5.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V13"/></svg>
+          <span>Compartir</span>
+        </button>
+        <button class="small-button" id="fullscreenButton" type="button" aria-label="Abrir en pantalla completa">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4H4v4M16 4h4v4M20 16v4h-4M4 16v4h4"/></svg>
+          <span>Pantalla completa</span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section class="reader" aria-label="Lector de El Pastor y la Cabra">
+        <button class="side-button prev" id="previousButton" type="button" aria-label="Doble página anterior">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 5-7 7 7 7"/></svg>
+        </button>
+
+        <div class="book-column">
+          <div class="book-stage" id="bookStage" aria-live="polite"></div>
+          <div class="controls">
+            <div class="progress-wrap">
+              <span id="currentLabel">Portada</span>
+              <input id="pageSlider" type="range" min="0" max="9" value="0" step="1" aria-label="Seleccionar doble página">
+              <strong id="pageCount">1 / 10</strong>
+            </div>
+            <p class="hint">Cada avance muestra una ilustración y, cuando la hay, el texto de esa página. Usa las flechas, desliza o toca los lados.</p>
+          </div>
+        </div>
+
+        <button class="side-button next" id="nextButton" type="button" aria-label="Doble página siguiente">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 5 7 7-7 7"/></svg>
+        </button>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Lectura digital · doble página</p>
+      <p class="ornament">✦ · ✦ · ✦</p>
+      <p>Diego Pérez Paz</p>
+    </footer>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const BOOK_TITLE = "El Pastor y la Cabra";
+    const BOOK_AUTHOR = "Diego Pérez Paz";
+    const spreads = [{"asset":"page-01.png","cover":true,"alt":"Diego y Claudia sostienen juntos un libro; la portada dice El Pastor y la Cabra."},{"asset":"page-02.png","page":1,"leftAlt":"Diego y Claudia comparten una escena en la cocina.","rightAlt":"La página derecha está en blanco en el original; conserva el folio 1."},{"asset":"page-03.png","page":2,"leftAlt":"Diego y Claudia conversan en casa.","rightAlt":"Texto del libro, página 2."},{"asset":"page-04.png","page":3,"leftAlt":"Diego escoge ropa en una tienda.","rightAlt":"Texto del libro, página 3."},{"asset":"page-05.png","page":4,"leftAlt":"Claudia acompaña a Diego en una tienda de ropa.","rightAlt":"Texto del libro, página 4."},{"asset":"page-06.png","page":5,"leftAlt":"Diego y Claudia hacen la compra juntos.","rightAlt":"Texto del libro, página 5."},{"asset":"page-07.png","page":6,"leftAlt":"Diego y Claudia pasan un rato juntos entre estanterías de libros.","rightAlt":"Texto del libro, página 6."},{"asset":"page-08.png","page":7,"leftAlt":"Claudia lee tranquilamente en casa junto a una taza de té.","rightAlt":"Texto del libro, página 7."},{"asset":"page-09.png","page":8,"leftAlt":"Diego y Claudia conversan desde la cama.","rightAlt":"Texto del libro, página 8."},{"asset":"page-10.png","page":9,"leftAlt":"Diego y Claudia se abrazan con cariño.","rightAlt":"Texto del libro, página 9."}];
+
+    const stage = document.getElementById("bookStage");
+    const previousButton = document.getElementById("previousButton");
+    const nextButton = document.getElementById("nextButton");
+    const slider = document.getElementById("pageSlider");
+    const currentLabel = document.getElementById("currentLabel");
+    const pageCount = document.getElementById("pageCount");
+    const toast = document.getElementById("toast");
+    let current = 0;
+    let toastTimer;
+    let touchStartX = null;
+
+    function addPage(frame, side, alt) {
+      const page = document.createElement("div");
+      page.className = `spread-page ${side}-page`;
+      page.style.backgroundImage = `url("assets/${frame.asset}")`;
+      page.setAttribute("role", "img");
+      page.setAttribute("aria-label", alt || "Página del libro");
+      return page;
+    }
+
+    function buildFrames() {
+      stage.innerHTML = "";
+      spreads.forEach((frame, index) => {
+        const element = document.createElement("figure");
+        const isSingle = frame.left === false;
+        element.className = `spread-frame${frame.cover ? " cover" : ""}${isSingle ? " single" : ""}`;
+        element.dataset.index = String(index);
+        element.setAttribute("aria-hidden", index === current ? "false" : "true");
+        element.setAttribute("aria-label", frame.cover ? "Portada" : `Doble página ${frame.page}`);
+
+        const left = frame.cover || isSingle
+          ? (() => { const blank = document.createElement("div"); blank.className = "spread-page left-page blank-page"; blank.setAttribute("aria-hidden", "true"); return blank; })()
+          : addPage(frame, "left", frame.leftAlt);
+        const right = addPage(frame, "right", frame.cover ? frame.alt : frame.rightAlt);
+        element.append(left, right);
+        stage.appendChild(element);
+      });
+      slider.max = String(spreads.length - 1);
+      render();
+    }
+
+    function render() {
+      const frame = spreads[current];
+      if (!frame) return;
+
+      stage.classList.toggle("is-cover", Boolean(frame.cover));
+      stage.classList.toggle("is-single", frame.left === false);
+
+      spreads.forEach((_, index) => {
+        const element = stage.querySelector(`[data-index="${index}"]`);
+        if (!element) return;
+        const active = index === current;
+        element.classList.toggle("active", active);
+        element.classList.toggle("previous", index < current);
+        element.setAttribute("aria-hidden", active ? "false" : "true");
+      });
+
+      currentLabel.textContent = frame.cover ? "Portada" : `Pág. ${frame.page} · doble página`;
+      pageCount.textContent = `${current + 1} / ${spreads.length}`;
+      slider.value = String(current);
+      previousButton.disabled = current === 0;
+      nextButton.disabled = current === spreads.length - 1;
+      document.title = frame.cover ? BOOK_TITLE : `${BOOK_TITLE} · Pág. ${frame.page}`;
+    }
+
+    function goTo(index) {
+      current = Math.max(0, Math.min(spreads.length - 1, index));
+      render();
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    previousButton.addEventListener("click", () => goTo(current - 1));
+    nextButton.addEventListener("click", () => goTo(current + 1));
+    slider.addEventListener("input", () => goTo(Number(slider.value)));
+
+    stage.addEventListener("click", (event) => {
+      const rect = stage.getBoundingClientRect();
+      const clickX = event.clientX - rect.left;
+      if (clickX < rect.width * .32) goTo(current - 1);
+      if (clickX > rect.width * .68) goTo(current + 1);
+    });
+
+    stage.addEventListener("touchstart", (event) => { touchStartX = event.changedTouches[0].clientX; }, { passive: true });
+    stage.addEventListener("touchend", (event) => {
+      if (touchStartX === null) return;
+      const delta = event.changedTouches[0].clientX - touchStartX;
+      touchStartX = null;
+      if (Math.abs(delta) > 42) goTo(current + (delta < 0 ? 1 : -1));
+    }, { passive: true });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") { event.preventDefault(); goTo(current + 1); }
+      if (event.key === "ArrowLeft" || event.key === "PageUp") { event.preventDefault(); goTo(current - 1); }
+      if (event.key === "Home") goTo(0);
+      if (event.key === "End") goTo(spreads.length - 1);
+    });
+
+    document.getElementById("fullscreenButton").addEventListener("click", async () => {
+      try {
+        if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+        else await document.exitFullscreen();
+      } catch { showToast("La pantalla completa no está disponible en este navegador."); }
+    });
+
+    document.getElementById("shareButton").addEventListener("click", async () => {
+      const shareData = { title: BOOK_TITLE, text: `Lee el libro digital de ${BOOK_AUTHOR}.`, url: window.location.href };
+      try {
+        if (navigator.share) { await navigator.share(shareData); return; }
+        await navigator.clipboard.writeText(window.location.href);
+        showToast("Enlace copiado. Ya puedes pegarlo para crear el QR.");
+      } catch (error) {
+        if (error && error.name === "AbortError") return;
+        showToast("Copia la dirección de esta página para compartirla.");
+      }
+    });
+
+    buildFrames();
+  </script>
+</body>
+</html>
