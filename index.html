@@ -207,15 +207,19 @@
       .side-button { position: absolute; z-index: 5; width: 43px; height: 43px; background: rgba(255, 253, 248, .88); }
       .side-button.prev { left: -6px; }
       .side-button.next { right: -6px; }
-      .book-stage { width: min(100%, 500px); aspect-ratio: 550 / 1700; }
-      .spread-frame { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; border-radius: 7px 17px 17px 7px; }
+      .book-stage { width: min(100%, 960px); aspect-ratio: 1100 / 850; }
+      .spread-frame { grid-template-columns: 1fr 1fr; grid-template-rows: none; border-radius: 7px 17px 17px 7px; }
+      .spread-frame:not(.cover):not(.single) { grid-template-areas: "text image"; }
+      .spread-frame:not(.cover):not(.single) .left-page { grid-area: image; }
+      .spread-frame:not(.cover):not(.single) .right-page { grid-area: text; }
       .book-stage.is-cover, .book-stage.is-single { aspect-ratio: 550 / 850; }
       .spread-frame.cover .left-page, .spread-frame.single .left-page { display: none; }
       .spread-frame.cover .right-page, .spread-frame.single .right-page { grid-row: 1 / -1; }
-      .spread-page.left-page { border-right: 0; border-bottom: 1px solid rgba(32, 49, 62, .14); }
+      .spread-page.left-page { border-right: 1px solid rgba(32, 49, 62, .14); border-bottom: 0; }
       .footer { align-items: flex-start; flex-direction: column; gap: 5px; }
       .footer .ornament { display: none; }
       .hint { font-size: 13px; }
+      .hint::after { display: block; margin-top: 4px; color: var(--copper); content: "Gira el móvil horizontalmente para leer la doble página."; font-size: 11px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
