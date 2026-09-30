@@ -193,6 +193,62 @@
     .toast { position: fixed; right: 18px; bottom: 18px; z-index: 10; max-width: min(320px, calc(100vw - 36px)); padding: 12px 15px; border-radius: 12px; color: #fffaf1; background: var(--blue-dark); box-shadow: 0 12px 28px rgba(29, 42, 47, .22); font-family: "Trebuchet MS", Arial, sans-serif; font-size: 13px; opacity: 0; transform: translateY(10px); transition: opacity .2s ease, transform .2s ease; pointer-events: none; }
     .toast.show { opacity: 1; transform: translateY(0); }
 
+    .password-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(181, 109, 78, .16), transparent 24rem),
+        radial-gradient(circle at 85% 82%, rgba(38, 62, 80, .18), transparent 28rem),
+        linear-gradient(135deg, #eee5d7 0%, #f7f2e9 48%, #e8e0d2 100%);
+    }
+
+    .password-gate[hidden] { display: none; }
+
+    .gate-card {
+      width: min(100%, 440px);
+      padding: clamp(28px, 7vw, 48px);
+      border: 1px solid rgba(32, 49, 62, .14);
+      border-radius: 24px;
+      background: rgba(255, 253, 248, .94);
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .gate-ornament { margin: 0 0 18px; color: var(--copper); font-size: 24px; letter-spacing: .32em; }
+    .gate-card h1 { margin: 0 auto 18px; font-size: clamp(27px, 7vw, 38px); line-height: 1.12; }
+    .gate-instruction { margin: 0 0 25px; color: var(--muted); font-size: clamp(17px, 4.5vw, 20px); line-height: 1.55; }
+    .gate-form { display: grid; gap: 12px; }
+    .gate-input {
+      width: 100%;
+      min-height: 52px;
+      padding: 0 16px;
+      border: 1px solid rgba(38, 62, 80, .24);
+      border-radius: 12px;
+      color: var(--ink);
+      background: #fff;
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      font-size: 18px;
+      letter-spacing: .2em;
+      text-align: center;
+    }
+    .gate-submit {
+      min-height: 50px;
+      border-radius: 999px;
+      color: #fffaf1;
+      background: var(--blue);
+      font-family: "Trebuchet MS", Arial, sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      transition: transform .2s ease, background .2s ease;
+    }
+    .gate-submit:hover { transform: translateY(-2px); background: var(--blue-dark); }
+    .gate-error { min-height: 1.4em; margin: 2px 0 0; color: #9b4438; font-family: "Trebuchet MS", Arial, sans-serif; font-size: 13px; }
+
     @media (max-width: 720px) {
       .app { padding-top: 16px; }
       .topbar { align-items: center; }
@@ -228,7 +284,20 @@
   </style>
 </head>
 <body>
-  <div class="app">
+  <section class="password-gate" id="passwordGate" aria-labelledby="gateTitle">
+    <div class="gate-card">
+      <p class="gate-ornament" aria-hidden="true">✦ · ✦ · ✦</p>
+      <h1 id="gateTitle">El Pastor y la Cabra</h1>
+      <p class="gate-instruction">Si tu regalo deseas descubir, nuestra fecha de aniversario has de introducir</p>
+      <form class="gate-form" id="passwordForm">
+        <label for="bookPassword" class="eyebrow">Contraseña</label>
+        <input class="gate-input" id="bookPassword" name="password" type="password" inputmode="numeric" autocomplete="off" required aria-describedby="passwordError">
+        <button class="gate-submit" type="submit">Abrir el libro</button>
+        <p class="gate-error" id="passwordError" role="alert" aria-live="assertive"></p>
+      </form>
+    </div>
+  </section>
+  <div class="app" id="bookApp" inert>
     <header class="topbar">
       <div>
         <p class="eyebrow">Una historia ilustrada de Diego y Claudia</p>
@@ -404,6 +473,38 @@
       } catch (error) {
         if (error && error.name === "AbortError") return;
         showToast("Copia la dirección de esta página para compartirla.");
+      }
+    });
+
+    const gate = document.getElementById("passwordGate");
+    const bookApp = document.getElementById("bookApp");
+    const passwordForm = document.getElementById("passwordForm");
+    const passwordInput = document.getElementById("bookPassword");
+    const passwordError = document.getElementById("passwordError");
+    const sessionKey = "librillo-el-pastor-y-la-cabra-unlocked";
+    const bookPassword = "08052021";
+
+    function unlockBook() {
+      gate.hidden = true;
+      bookApp.removeAttribute("inert");
+      sessionStorage.setItem(sessionKey, "true");
+      passwordInput.value = "";
+    }
+
+    if (sessionStorage.getItem(sessionKey) === "true") {
+      unlockBook();
+    } else {
+      passwordInput.focus();
+    }
+
+    passwordForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (passwordInput.value === bookPassword) {
+        passwordError.textContent = "";
+        unlockBook();
+      } else {
+        passwordError.textContent = "Esa no es la fecha. Inténtalo de nuevo.";
+        passwordInput.select();
       }
     });
 
